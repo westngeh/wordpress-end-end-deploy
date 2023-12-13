@@ -34,17 +34,6 @@ spec:
             - name: WORDPRESS_DB_NAME
               value: wordpress
 
-        - name: mariadb
-          image: mariadb:latest
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              value: dbuser@123
-            - name: MYSQL_DATABASE
-              value: wordpress
-            - name: MYSQL_USER
-              value: dbuser
-            - name: MYSQL_PASSWORD
-              value: dbuser@123
 ---
 apiVersion: v1
 kind: Service
@@ -66,6 +55,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
+  storageClassName: "ebs-sc"  # Update this with the correct storage class
   resources:
     requests:
       storage: 1Gi
@@ -103,11 +93,13 @@ spec:
         volumeMounts:
         - name: mariadb-pvc
           mountPath: /var/lib/mysql
+          subPath: mariadb-data
   volumeClaimTemplates:
   - metadata:
       name: mariadb-pvc
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "ebs-sc"  # Update this with the correct storage class
       resources:
         requests:
           storage: 1Gi
